@@ -1,4 +1,4 @@
-import ChartView from './components/chart-view'
+import ChartView from './components/chart/chart-view'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
 const queryClient = new QueryClient();
