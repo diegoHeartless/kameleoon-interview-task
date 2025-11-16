@@ -1,6 +1,13 @@
 import type { WeekOption } from "../../model/chart-model";
 
-export const getWeekOptions = (xAxisData: string[]) => {
+/**
+ * Генерирует опции недель для селектора масштабирования по неделям из массива дат.
+ * Группирует даты в недельные интервалы.
+ *
+ * @param xAxisData - Массив строк дат для группировки в недели
+ * @returns Массив опций недель с начальными и конечными значениями дат
+ */
+export const getWeekOptions = (xAxisData: string[]): WeekOption[] => {
     const weeks: WeekOption[] = [];
     const xAxisDataTemp = [...xAxisData];
     let firstDay: string | undefined;

@@ -1,68 +1,117 @@
 /**
- * Describes a single experiment variation returned from the backend.
+ * Описывает один вариант эксперимента, возвращаемый с бэкенда.
  */
 export type Variation = {
     /**
-     * Unique identifier for the variation. Absent for the `Original` entry that represents the control.
+     * Уникальный идентификатор варианта. Отсутствует для записи `Original`, которая представляет контрольную группу.
      */
     id?: number;
     /**
-     * Human-readable variation name.
+     * Читаемое имя варианта.
      */
     name: string;
 };
 
 /**
- * Holds visit and conversion metrics for a specific date.
+ * Содержит метрики посещений и конверсий для конкретной даты.
  */
 export type ChartData = {
     /**
-     * ISO-like date string (YYYY-MM-DD) representing the data point.
+     * Строка даты в формате ISO (YYYY-MM-DD), представляющая точку данных.
      */
     date: string;
     /**
-     * Indexed collection of visit counts mapped by variation identifier.
+     * Индексированная коллекция количества посещений, сопоставленная по идентификатору варианта.
      */
     visits: Record<string, number>;
     /**
-     * Indexed collection of conversion counts mapped by variation identifier.
+     * Индексированная коллекция количества конверсий, сопоставленная по идентификатору варианта.
      */
     conversions: Record<string, number>;
 };
 
 /**
- * Complete payload returned by `GET /data`.
+ * Полный ответ, возвращаемый `GET /data`.
  */
 export type ChartResponse = {
     /**
-     * Collection of registered experiment variations.
+     * Коллекция зарегистрированных вариантов эксперимента.
      */
     variations: Variation[];
     /**
-     * Time series metrics for each variation.
+     * Временные ряды метрик для каждого варианта.
      */
     data: ChartData[];
 };
 
+/**
+ * Параметры функции форматирования подсказки графика.
+ */
 export type FormatterParams = Array<{
+    /**
+     * Значение оси (дата) для точки данных.
+     */
     axisValue: string | number;
+    /**
+     * Цвет линии серии.
+     */
     color: string;
+    /**
+     * Имя серии.
+     */
     seriesName: string;
+    /**
+     * Значение данных (процент конверсии).
+     */
     data: number;
 }>;
 
+/**
+ * Опция для компонентов выбора/выпадающего списка.
+ */
 export type SelectorOption = {
+    /**
+     * Отображаемая метка опции.
+     */
     label: string;
+    /**
+     * Необязательное значение, связанное с опцией.
+     */
     value?: number | string | null;
 };
 
+/**
+ * Опция недели для селектора масштабирования по неделям.
+ */
 export type WeekOption = SelectorOption & {
+    /**
+     * Значение начальной даты для диапазона недели.
+     */
     startValue: string;
+    /**
+     * Значение конечной даты для диапазона недели.
+     */
     endValue: string;
 };
+
+/**
+ * Структура данных серии для отрисовки графика.
+ */
 export type SeriesData = {
+    /**
+     * Имя серии (имя варианта).
+     */
     name: string;
+    /**
+     * Данные оси X (даты).
+     */
     xAxisData: string[];
+    /**
+     * Максимальное значение оси Y для масштабирования.
+     */
     maxY: number;
+    /**
+     * Точки данных серии (проценты конверсии).
+     */
     data: number[];
 };

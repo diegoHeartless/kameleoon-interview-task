@@ -224,8 +224,7 @@ const ChartView = () => {
 
         const weeks: WeekOption[] = getWeekOptions(options.xAxis.data);
 
-        const weeksChanged =
-            !countWeek || JSON.stringify(weeks) !== JSON.stringify(countWeek);
+        const weeksChanged = !countWeek || JSON.stringify(weeks) !== JSON.stringify(countWeek);
         if (weeksChanged) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setCountWeek(weeks);
