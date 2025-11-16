@@ -20,6 +20,16 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    plugins: {
+      'react-hooks': reactHooks,
+    },
+    rules: {
+      // Строгая проверка зависимостей в хуках (useEffect, useCallback, useMemo)
+      // Проверяет, что все зависимости указаны в массиве зависимостей
+      'react-hooks/exhaustive-deps': 'error',
+      // Проверка правил использования хуков (hooks rules)
+      'react-hooks/rules-of-hooks': 'error',
+    },
   },
   prettierConfig,
 ])

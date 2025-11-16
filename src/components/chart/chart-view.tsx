@@ -48,11 +48,18 @@ const ChartView = () => {
     }, [dataResponse?.variations]);
 
     useEffect(() => {
-        if (seriesControl?.length > 0) {
+        if (seriesControl?.[0] && !selectedSeries) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSelectedSeries(seriesControl?.[0]);
+        }
+    }, [seriesControl, selectedSeries]);
+
+    useEffect(() => {
+        if (chartsStyles?.[0] && !selectedChartStyle) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSelectedChartStyle(chartsStyles?.[0]);
         }
-    }, [seriesControl, setSelectedSeries, chartsStyles, setSelectedChartStyle]);
+    }, [chartsStyles, selectedChartStyle]);
 
     const formatter = useCallback((params: FormatterParams) => {
         const colorSpanStyle =
@@ -217,11 +224,16 @@ const ChartView = () => {
 
         const weeks: WeekOption[] = getWeekOptions(options.xAxis.data);
 
-        setCountWeek(weeks);
+        const weeksChanged =
+            !countWeek || JSON.stringify(weeks) !== JSON.stringify(countWeek);
+        if (weeksChanged) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setCountWeek(weeks);
+        }
 
         chartRef.current.clear();
         chartRef.current.setOption(options, { notMerge: true });
-    }, [currentSeries, formatter, lineOptions, setCountWeek]);
+    }, [currentSeries, formatter, lineOptions, countWeek]);
 
     useEffect(() => {
         if (!chartContainerRef.current) {
