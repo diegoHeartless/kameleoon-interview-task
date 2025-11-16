@@ -8,6 +8,9 @@ import type { WeekOption } from "../../model/chart-model";
  * @returns Массив опций недель с начальными и конечными значениями дат
  */
 export const getWeekOptions = (xAxisData: string[]): WeekOption[] => {
+    if (!xAxisData) {
+        return [];
+    }
     const weeks: WeekOption[] = [];
     const xAxisDataTemp = [...xAxisData];
     let firstDay: string | undefined;
