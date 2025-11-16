@@ -56,6 +56,10 @@ export type SelectorOption = {
     value?: number | string | null;
 };
 
+export type WeekOption = SelectorOption & {
+    startValue: string;
+    endValue: string;
+};
 export type SeriesData = {
     name: string;
     xAxisData: string[];

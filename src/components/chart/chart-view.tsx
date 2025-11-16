@@ -8,10 +8,12 @@ import type {
     SelectorOption,
     SeriesData,
     FormatterParams,
+    WeekOption,
 } from "../../model/chart-model";
 import type { ECharts } from "echarts";
 import Select, { type SingleValue } from "react-select";
 import styles from "./chart-view.module.css";
+import { getWeekOptions } from "./chart-utils";
 
 const ChartView = () => {
     const dataResponse: ChartResponse | undefined = useGetData();
@@ -20,6 +22,8 @@ const ChartView = () => {
     const [selectedSeries, setSelectedSeries] = useState<SingleValue<SelectorOption>>();
     const [selectedChartStyle, setSelectedChartStyle] = useState<SingleValue<SelectorOption>>();
     const [theme, setTheme] = useState<"dark" | "light">("light");
+    const [countWeek, setCountWeek] = useState<SingleValue<WeekOption[]>>();
+    const [currentWeek, setCurrentWeek] = useState<SingleValue<WeekOption>>();
 
     const chartsStyles: SelectorOption[] = useMemo(
         () => [
@@ -51,12 +55,11 @@ const ChartView = () => {
     }, [seriesControl, setSelectedSeries, chartsStyles, setSelectedChartStyle]);
 
     const formatter = useCallback((params: FormatterParams) => {
+        const colorSpanStyle =
+            "display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px";
         const colorSpan = (color: string): string =>
-            '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' +
-            color +
-            '"></span>';
+            `<span style="${colorSpanStyle};background-color:${color}"></span>`;
         let rez: string = "<p>" + params[0].axisValue + "</p>";
-        console.log(params);
         params
             .filter((item) => item.data)
             .sort((a, b) => b.data - a.data)
@@ -74,7 +77,6 @@ const ChartView = () => {
                     rez += xx;
                 }
             });
-        console.log(rez);
         return rez;
     }, []);
 
@@ -151,11 +153,11 @@ const ChartView = () => {
                 feature: {
                     saveAsImage: {
                         show: true,
-                        type: 'png'
-                    }
-                }
+                        type: "png",
+                    },
+                },
             },
-            xAxis: { axisLabel: { interval: "auto", rotate: 45 }, data: {} },
+            xAxis: { axisLabel: { interval: "auto", rotate: 45 }, data: [] as string[] },
             yAxis: { axisLabel: { formatter: "{value} %" }, max: 0 },
             series: {},
             legend: {
@@ -170,7 +172,7 @@ const ChartView = () => {
                 type: "line",
                 data: series.data,
             }));
-            const xAxisData = currentSeries.sort(
+            const xAxisData: string[] = currentSeries.sort(
                 (a, b) => b.xAxisData.length - a.xAxisData.length
             )[0]?.xAxisData;
             const maxY = currentSeries.sort((a, b) => b.maxY - a.maxY)[0]?.maxY;
@@ -213,9 +215,13 @@ const ChartView = () => {
             };
         }
 
+        const weeks: WeekOption[] = getWeekOptions(options.xAxis.data);
+
+        setCountWeek(weeks);
+
         chartRef.current.clear();
         chartRef.current.setOption(options, { notMerge: true });
-    }, [currentSeries, formatter, lineOptions]);
+    }, [currentSeries, formatter, lineOptions, setCountWeek]);
 
     useEffect(() => {
         if (!chartContainerRef.current) {
@@ -251,6 +257,32 @@ const ChartView = () => {
         };
     }, [resizeChart]);
 
+    const weekZoom = useCallback(() => {
+        if (currentWeek) {
+            chartRef.current?.setOption({
+                dataZoom: [
+                    {
+                        startValue: currentWeek.startValue,
+                        endValue: currentWeek.endValue,
+                    },
+                ],
+            });
+        } else {
+            chartRef.current?.setOption({
+                dataZoom: [
+                    {
+                        start: 0,
+                        end: 100,
+                    },
+                ],
+            });
+        }
+    }, [currentWeek]);
+
+    useEffect(() => {
+        weekZoom();
+    }, [currentWeek, weekZoom]);
+
     return (
         <div className={styles.container}>
             <div className={styles.controls}>
@@ -270,6 +302,16 @@ const ChartView = () => {
                         value={selectedChartStyle}
                     />
                 </div>
+                <div className={styles.select}>
+                    <Select
+                        options={countWeek || []}
+                        onChange={(value: SingleValue<SelectorOption>) => {
+                            setCurrentWeek(value as SingleValue<WeekOption>);
+                        }}
+                        value={currentWeek}
+                        isClearable={true}
+                    />
+                </div>
                 <button
                     className={styles.button}
                     onClick={() => {
@@ -281,6 +323,7 @@ const ChartView = () => {
                                 },
                             ],
                         });
+                        setCurrentWeek(null);
                     }}
                 >
                     Reset Zoom
